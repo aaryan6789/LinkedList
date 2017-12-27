@@ -345,7 +345,6 @@ void form_a_loop(struct node *head, struct node *loop_attach) {
 
 /** Delete a Linked List */
 void delete_list(struct node **head_ref) {
-
 	struct node *current, *next;
 	current = *head_ref;
 
@@ -360,45 +359,320 @@ void delete_list(struct node **head_ref) {
 	return;
 }
 
+/**
+ * insert_in_sorted_list - Insert a newNode in a Sorted Single Linked List
+ * @IP : Head reference, neWNode
+ * Algorithm:
+ * 1. If the linked List is empty then make this node as the head and return.
+ * 2. If the value of this node is smaller than the head node then insert in the
+ * 	  front of the head node and make this as the new head.
+ * 3. Traverse through the Linked List,
+ * 		Find the node where you can insert this node. This node will be inserted
+ * 		before the node which is larger than data.
+ * 		Insert the node and make links.
+ */
+void insert_in_sorted_list(struct node** head_ref, struct node* newNode){
+	printf("Inserting in a Sorted Linked List..\n");
+	struct node *current = *head_ref; // For Traversing
+
+	if (current == NULL || current->data >= newNode->data){
+		//printf("Current->data = %d\n", current->data);
+		newNode->next = current;
+		current = newNode;
+		*head_ref = current;
+		return;
+	}
+	else {
+		// Find the appropriate place to insert the newNode
+		while ((current->next != NULL) && (current->next->data <= newNode->data)){
+			current = current->next;
+		}
+		// Now current is pointing to the node right after which the newNode should
+		// be inserted
+		newNode->next = current->next;
+		current->next = newNode;
+	}
+	return;
+}
+
+/**
+ * Remove Duplicates from a Sorted Single Linked List
+ *
+ * 1. next_next
+ * 2. Current
+ *
+ *1. Traverse through the Linked List
+ *2. If its an Empty List return immediately
+ *3. Else, In a loop,
+ *		compare the nodes data and the data of the next node
+ *		since its a sorted linked list the duplicates will be adjacent.
+ *		If its a hit
+ *		Store the next->next node in next_next pointer to create the link.
+ */
+void remove_duplicates_from_sorted_list(struct node **head_ref) {
+
+	struct node* current;
+	struct node* next_next;
+
+	current = *head_ref;
+
+	if (current == NULL)
+		return;
+
+	while(current->next != NULL){
+		if(current->data == current->next->data){
+			next_next = current->next->next;
+			free(current->next);
+			current->next = next_next;
+		}
+		else
+			current = current->next;
+	}
+}
+
+/**
+ * Remove Duplicates from Unsorted Linked List [CTCI]
+ * Method 1 : Using 2 Loops
+ * 1. Loop 1 will pick elements one by one
+ * 2. Loop 2 will compare the picked element with the rest of the elements
+ * 		When a duplicate is encountered. Delete it.
+ */
+void remove_duplicates_from_unsorted_list(struct node** head_ref){
+	// @2 loops -- Time: O(n2) but Space: O(1)
+
+	struct node* current1;
+	struct node* current2;
+	struct node* next_next;
+
+	current1 = *head_ref;
+
+	while (current1 != NULL || current1->next != NULL){
+		current2 = current1;
+		while(current2->next != NULL){
+			if(current1->data == current2->next->data){
+				next_next = current2->next->next;
+				free(current2->next);
+				current2->next = next_next;
+			}
+			else
+				current2= current2->next;
+		}
+		current1 = current1->next;
+	}
+}
+
+/**
+ * get_tail - Gets the last node of a Linked List
+ */
+struct node* get_tail(struct node* head){
+	struct node* current = head;
+
+	while(current->next != NULL){
+		current = current->next;
+	}
+
+	printf("Tail : %d Address = %p\n", current->data, current);
+	return current;
+}
+
+/**
+ * get_intersection - Gets the intersection point of a definite Intesecting Lists
+ */
+void get_intersection(int diff, struct node* head1, struct node* head2){
+
+	struct node* current1 = head1;
+	struct node* current2 = head2;
+
+	for (int i = 0; i<diff; i++){
+		if (current2 == NULL){
+			printf("NULL current 2");
+			return;
+		}
+		printf("current2->data = %d\n", current2->data);
+		current2 = current2->next;
+	}
+
+	while (current2 != NULL && current1 != NULL){
+		if (current2 == current1){
+			printf("Intersection point is %d", current2->data);
+			return;
+		}
+		else {
+			printf("current2->data = %d , current1->data = %d\n", current2->data, current1->data );
+			current2 = current2->next;
+			current1 = current1->next;
+		}
+	}
+	return;
+}
+
+/**
+ * find_intersection - Find the intersection of 2 linked lists, if any.
+ * 1. Get Length of List1
+ * 2. Get length of List2
+ * 3. Get the difference
+ * 4. Traverse the Longer list by diff nodes
+ * 5. Traverse both the lists together comparing the nodes references.
+ */
+void find_intersection(struct node *head1, struct node* head2){
+
+	int diff = 0;
+	int length1, length2;
+	struct node* tail1;
+	struct node* tail2;
+
+	tail1 = get_tail(head1);
+	tail2 = get_tail(head2);
+
+	if ((tail1) == (tail2)){
+		printf("Intersecting Lists. %p\n", tail1);
+	}
+	else {
+		printf("Not Intersecting Lists.\n");
+		return;
+	}
+
+	length1 = length_of_list(head1);
+	printf("Length1 = %d\n", length1);
+	length2 = length_of_list(head2);
+	printf("Length2 = %d\n", length2);
+
+	if (length2 > length1) {
+		diff = length2 - length1;
+		get_intersection(diff, head1, head2);
+	}
+	else {
+		diff = length1-length2;
+		get_intersection(diff, head2, head1);
+	}
+
+	return;
+}
+
+/**
+ * partition_list - Partition a linked List around a value X.
+ * It doesn't preserve the original order of the of the Nodes hence called UNSTABLE.
+ */
+struct node* partition_list_unstable(struct node* head_list, int x){
+	struct node* current = head_list;
+	struct node* head = head_list;
+	struct node* tail = head_list;
+
+	while (current != NULL) {
+		/* cache next node */
+		struct node* next = current->next;
+		if (current->data < x){
+			/* Insert in the Front or head */
+			current->next = head;
+			head = current;
+		}
+		else {
+			/* Insert node at tail */
+			tail->next = current;
+			tail = current;
+		}
+
+		current = next;
+	}
+
+	tail->next = NULL;
+
+	head_list = head;
+	return head_list;
+}
+
+
+
+
+// Reverse a Linked List
+// Compare 2 lists Identical or not
+// Check if a Linked List is a Palindrome or not.
+
 
 int main(){
 	printf("------ Linked List Practice file ------------ \n");
 	/* Start with a Empty list */
 	struct node *head = NULL;
 
+
 	// Insert
-	insert_last(&head, 9);
-	print_list(head);
-	insert_beginning(&head, 5);
-	insert_beginning(&head, 6);
-	insert_beginning(&head, 4);
-	print_list(head);
+	//insert_last(&head, 9);
+	//print_list(head);
+	//insert_beginning(&head, 8);
+	//insert_beginning(&head, 6);
+	//insert_beginning(&head, 4);
+	//print_list(head);
 	//printf("\nHead of the Linked list: %d\n", head->data);
-	insert_after(&head, 1 , 4);
-	print_list(head);
-	insert_after(&head, 3 , 2);
-	print_list(head);
-	insert_last(&head, 8);
-	print_list(head);
-	insert_after(&head, 10 , 7);
-	print_list(head);
-	struct node *current = head;
-	struct node *loop_attach = current->next;
+	//insert_after(&head, 1 , 4);
+	//print_list(head);
+	//insert_after(&head, 3 , 2);
+	//print_list(head);
+	//insert_last(&head, 10);
+	//print_list(head);
+	//insert_after(&head, 10 , 7);
+	//print_list(head);
+	//struct node *current = head;
+	//struct node *loop_attach = current->next;
 	//delete_node(current->next->next);
 	//delete_node(head);
-	insert_after(&head, 11 , 11);
+	//insert_after(&head, 11 , 11);
+	//print_list(head);
+
+	//get_nth_node(head, 4);
+	//get_nth_last(head, 5);
+	//print_list(head);
+	//get_middle(head);
+	//detect_loop(head);
+	//form_a_loop(head, loop_attach);
+	//detect_remove_loop(head);
+	//delete_list(&head);
+	struct node *newNode = (struct node*)malloc(sizeof(struct node));
+	if(!newNode)
+		printf("malloc failed\n");
+
+	newNode->data = 5;
+	newNode->next = NULL;
+
+	insert_in_sorted_list(&head, newNode);
 	print_list(head);
 
-	get_nth_node(head, 4);
-	get_nth_last(head, 5);
-	print_list(head);
-	get_middle(head);
-	detect_loop(head);
-	form_a_loop(head, loop_attach);
-	detect_remove_loop(head);
-	delete_list(&head);
+	/* Test Intersection Code */
+	struct node *head1 = NULL;
+	struct node *head2 = NULL;
 
-	print_list(head);
+	insert_last(&head1, 11);
+	insert_last(&head1, 13);
+	insert_last(&head1, 9);
+	insert_last(&head1, 7);
+	insert_last(&head1, 5);
 
+	insert_last(&head, 11);
+	insert_last(&head, 13);
+	insert_last(&head2, 1);
+	insert_last(&head2, 3);
+	insert_last(&head2, 5);
+
+	struct node *intersectingNode = (struct node*)malloc(sizeof(struct node));
+	if(!intersectingNode)
+		printf("malloc failed\n");
+
+	intersectingNode->data = 6;
+	intersectingNode->next = NULL;
+
+	print_list(head1);
+	print_list(head2);
+	form_a_loop(head1, intersectingNode);
+	form_a_loop(head2, intersectingNode);
+	print_list(head1);
+	insert_last(&head1, 15);
+	insert_last(&head1, 25);
+	print_list(head1);
+	print_list(head2);
+
+	find_intersection(head1, head2);
+
+	print_list(head1);
+	head1 = partition_list_unstable(head1, 14);
+	print_list(head1);
 	return 0;
 }
