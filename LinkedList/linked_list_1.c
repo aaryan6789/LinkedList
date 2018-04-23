@@ -3,16 +3,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <error.h>
+#include "Linked_List.h"
 
-/* 1. Define a Linked List
- * 2. Insert in a Linked List
- * 3. Delete from a Linked List
- */
-
-struct node {
-	int data;
-	struct node* next;
-};
+/* Structure to represent a Singly Linked List */
+//struct node {
+//	int data;
+//	struct node* next;
+//};
 
 void print_list(struct node* head)
 {
@@ -242,106 +239,7 @@ void get_middle(struct node *head) {
 	printf("The middle of the Linked List is=%d\n", slow->data);
 }
 
-/* detect_loop - Detect a loop in a Linked List
- * Method: Floyd's Cycle Finding Algorithm
- * 1. Declare 2 pointers for traversing the LL
- * -- fast  --> increment by 2 nodes
- * -- slow  --> increment by 1 node
- * 2. If these 2 pointers meet at some point in then there definitely
- * there is a loop. If they dont then no loop.
- *
- * This concept can be extended for removing the loop too.
- */
-void detect_loop(struct node* head) {
 
-	struct node *slow, *fast;
-	slow = fast = head;
-
-	while (slow && fast && fast->next){
-		fast = fast->next->next;
-		slow = slow->next;
-		if (slow == fast){
-			printf("There is a loop in this linked list.\n");
-			return;
-		}
-	}
-	printf("No loop detected.\n");
-}
-
-void _remove_loop(struct node *loop_node, struct node *head){
-	struct node *ptr1, *ptr2;
-	ptr1 = ptr2 = loop_node;
-
-	// count the number of nodes in the loop
-	int k = 1;
-	int i;
-
-	while (ptr1->next != ptr2){
-		ptr1 = ptr1->next;
-		k++;
-	}
-	printf("Number of LoopNodes:%d\n", k);
-
-	// Set ptr1 to head & ptr2 to (head + k)
-	ptr1 = ptr2 = head;
-
-	for (i = 0 ; i< k ; i++)
-		ptr2 = ptr2->next;
-
-	// Move both pointers at the same pace now
-	while (ptr2 != ptr1) {
-		ptr1 = ptr1->next;
-		ptr2 = ptr2->next;
-	}
-
-	// Get the next of the start of the loop node
-	ptr2 = ptr2->next;
-
-	while(ptr2->next != ptr1)
-		ptr2 = ptr2->next;
-
-	ptr2->next = NULL;
-
-	printf("Loop removed.\n");
-}
-
-void detect_remove_loop(struct node *head) {
-
-	struct node *slow, *fast;
-	slow = fast = head;
-
-	while (slow && fast && fast->next){
-		fast = fast->next->next;
-		slow = slow->next;
-		if (slow == fast){
-			printf("There is a loop in this linked list.\nRemoving Loop now.\n");
-			_remove_loop(slow, head);
-			return;
-		}
-	}
-	printf("No loop detected.\n");
-}
-
-/**
- * Form a Loop in a Linked List by attaching the last node to a node in the
- * middle of the Linked list.
- * Pretty sweet implementation :)
- */
-void form_a_loop(struct node *head, struct node *loop_attach) {
-	struct node *current = head;
-
-	// Go to the last node
-	while (current->next != NULL){
-		current = current->next;
-	}
-
-	// Forming loop
-	printf("loop_attach->data:%d current->data:%d\n", loop_attach->data, current->data);
-	current->next = loop_attach;
-
-	printf("current->next->data:%d\n", current->next->data);
-	printf("Loop Formed.\n");
-}
 
 /** Delete a Linked List */
 void delete_list(struct node **head_ref) {
@@ -349,7 +247,7 @@ void delete_list(struct node **head_ref) {
 	current = *head_ref;
 
 	while (current->next != NULL) {
-		next = current->next;
+		next = current->next;			// Cache the next node
 		//printf("Deleting %d\n", current->data);
 		free(current);
 		current = next;
@@ -408,6 +306,8 @@ void insert_in_sorted_list(struct node** head_ref, struct node* newNode){
  *		since its a sorted linked list the duplicates will be adjacent.
  *		If its a hit
  *		Store the next->next node in next_next pointer to create the link.
+ *
+ * Time Complexity = O(n)
  */
 void remove_duplicates_from_sorted_list(struct node **head_ref) {
 
@@ -421,7 +321,7 @@ void remove_duplicates_from_sorted_list(struct node **head_ref) {
 
 	while(current->next != NULL){
 		if(current->data == current->next->data){
-			next_next = current->next->next;
+			next_next = current->next->next;		// Cache the next next node
 			free(current->next);
 			current->next = next_next;
 		}
@@ -461,93 +361,6 @@ void remove_duplicates_from_unsorted_list(struct node** head_ref){
 	}
 }
 
-/**
- * get_tail - Gets the last node of a Linked List
- */
-struct node* get_tail(struct node* head){
-	struct node* current = head;
-
-	while(current->next != NULL){
-		current = current->next;
-	}
-
-	printf("Tail : %d Address = %p\n", current->data, current);
-	return current;
-}
-
-/**
- * get_intersection - Gets the intersection point of a definite Intesecting Lists
- */
-void get_intersection(int diff, struct node* head1, struct node* head2){
-
-	struct node* current1 = head1;
-	struct node* current2 = head2;
-
-	for (int i = 0; i<diff; i++){
-		if (current2 == NULL){
-			printf("NULL current 2");
-			return;
-		}
-		printf("current2->data = %d\n", current2->data);
-		current2 = current2->next;
-	}
-
-	while (current2 != NULL && current1 != NULL){
-		if (current2 == current1){
-			printf("Intersection point is %d", current2->data);
-			return;
-		}
-		else {
-			printf("current2->data = %d , current1->data = %d\n", current2->data, current1->data );
-			current2 = current2->next;
-			current1 = current1->next;
-		}
-	}
-	return;
-}
-
-/**
- * find_intersection - Find the intersection of 2 linked lists, if any.
- * 1. Get Length of List1
- * 2. Get length of List2
- * 3. Get the difference
- * 4. Traverse the Longer list by diff nodes
- * 5. Traverse both the lists together comparing the nodes references.
- */
-void find_intersection(struct node *head1, struct node* head2){
-
-	int diff = 0;
-	int length1, length2;
-	struct node* tail1;
-	struct node* tail2;
-
-	tail1 = get_tail(head1);
-	tail2 = get_tail(head2);
-
-	if ((tail1) == (tail2)){
-		printf("Intersecting Lists. %p\n", tail1);
-	}
-	else {
-		printf("Not Intersecting Lists.\n");
-		return;
-	}
-
-	length1 = length_of_list(head1);
-	printf("Length1 = %d\n", length1);
-	length2 = length_of_list(head2);
-	printf("Length2 = %d\n", length2);
-
-	if (length2 > length1) {
-		diff = length2 - length1;
-		get_intersection(diff, head1, head2);
-	}
-	else {
-		diff = length1-length2;
-		get_intersection(diff, head2, head1);
-	}
-
-	return;
-}
 
 /**
  * partition_list - Partition a linked List around a value X.
@@ -580,9 +393,6 @@ struct node* partition_list_unstable(struct node* head_list, int x){
 	head_list = head;
 	return head_list;
 }
-
-
-
 
 // Reverse a Linked List
 // Compare 2 lists Identical or not
@@ -674,5 +484,38 @@ int main(){
 	print_list(head1);
 	head1 = partition_list_unstable(head1, 14);
 	print_list(head1);
+
+	//rotate_list(head1, 3);
+
+	//deleteNskipM_alternatively(head1, 2, 2);
+
+	print_list(head1);
+	//get_nth_last(head1, 4);
+	remove_nth_node_from_end_2(&head1, 4);
+	remove_nth_node_from_end_2(&head1, 1);
+
+	print_list(head1);
+
+	deleteNskipM(head1, 2, 3);
+	print_list(head1);
+
+/* ----------- Add 2 Linked List Elements ----------------- */
+	struct node* list1 = NULL;
+	struct node* list2 = NULL;
+
+	insert_last(&list1, 2);
+	insert_last(&list1, 3);
+	insert_last(&list1, 4);
+
+	insert_last(&list2, 5);
+	insert_last(&list2, 3);
+	insert_last(&list2, 7);
+
+	print_list(list1);
+	print_list(list2);
+
+	struct node* result = addTwoLists(list1, list2);
+
+	print_list(result);
 	return 0;
 }

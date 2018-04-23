@@ -40,6 +40,35 @@
  */
 
 
+/* Structure to represent a Singly Linked List */
+struct node {
+	int data;
+	struct node* next;
+};
+
+int length_of_list(struct node *head);
+
+void insert_last(struct node **head_ref, int data);
+struct node* addTwoLists(struct node* head1, struct node* head2);
+struct node* removeElements(struct node* head, int val);
+struct node* remove_nth_node_from_end(struct node** head_ref, int n);
+void remove_nth_node_from_end_2(struct node** head_ref, int n);
+void deleteNskipM(struct node* head, int n, int m);
+void deleteNskipM_alternatively(struct node* head, int n, int m);
+
+// List Intersection
+struct node* get_tail(struct node* head);
+void get_intersection(int diff, struct node* head1, struct node* head2);
+void find_intersection(struct node *head1, struct node* head2);
+
+// Detect Remove Loop
+void detect_loop(struct node* head);
+void _remove_loop(struct node *loop_node, struct node *head);
+void detect_remove_loop(struct node *head);
+void form_a_loop(struct node *head, struct node *loop_attach);
+
+
+void rotate_list(struct node* head, int k);
 
 
 #endif /* LINKED_LIST_H_ */
