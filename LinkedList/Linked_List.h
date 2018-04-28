@@ -66,7 +66,7 @@ void detect_loop(struct node* head);
 void _remove_loop(struct node *loop_node, struct node *head);
 void detect_remove_loop(struct node *head);
 void form_a_loop(struct node *head, struct node *loop_attach);
-
+struct node* partition_list_unstable(struct node* head_list, int x);
 
 void rotate_list(struct node* head, int k);
 

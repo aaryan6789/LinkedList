@@ -362,37 +362,7 @@ void remove_duplicates_from_unsorted_list(struct node** head_ref){
 }
 
 
-/**
- * partition_list - Partition a linked List around a value X.
- * It doesn't preserve the original order of the of the Nodes hence called UNSTABLE.
- */
-struct node* partition_list_unstable(struct node* head_list, int x){
-	struct node* current = head_list;
-	struct node* head = head_list;
-	struct node* tail = head_list;
 
-	while (current != NULL) {
-		/* cache next node */
-		struct node* next = current->next;
-		if (current->data < x){
-			/* Insert in the Front or head */
-			current->next = head;
-			head = current;
-		}
-		else {
-			/* Insert node at tail */
-			tail->next = current;
-			tail = current;
-		}
-
-		current = next;
-	}
-
-	tail->next = NULL;
-
-	head_list = head;
-	return head_list;
-}
 
 // Reverse a Linked List
 // Compare 2 lists Identical or not
